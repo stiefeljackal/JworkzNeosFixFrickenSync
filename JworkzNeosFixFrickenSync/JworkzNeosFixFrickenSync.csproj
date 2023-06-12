@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectGuid>{131BCCF9-6220-4831-9832-9671ACE4686E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JworkzNeosMod</RootNamespace>
+    <AssemblyTitle>JworkzNeosFixFrickenSync</AssemblyTitle>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net462</TargetFramework>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NeosPath>$(MSBuildThisFileDirectory)NeosVR</NeosPath>
+    <NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
+    <NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
+    <NeosPath Condition="Exists('C:\Neos\app\')">C:\Neos\app\</NeosPath>
+    <CopyLocal>false</CopyLocal>
+    <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
+    <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
+    <DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
+    <AssemblyName>JworkzNeosFixFrickenSync</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="FrooxEngine">
+      <HintPath>C:\Neos\app\Neos_Data\Managed\FrooxEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="HarmonyLib">
+      <HintPath>$(NeosPath)nml_libs\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(NeosPath)0Harmony.dll')">$(NeosPath)0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BaseX">
+      <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
+    </Reference>
+	<Reference Include="CloudX.Shared">
+		<HintPath>$(NeosPath)Neos_Data\Managed\CloudX.Shared.dll</HintPath>
+	</Reference>
+    <Reference Include="NeosModLoader">
+      <HintPath>$(NeosPath)Libraries\NeosModLoader.dll</HintPath>
+      <HintPath Condition="Exists('$(NeosPath)NeosModLoader.dll')">$(NeosPath)NeosModLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+	<Reference Include="BepuPhysics">
+		<HintPath>$(NeosPath)Neos_Data\Managed\BepuPhysics.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstract\" />
+    <Folder Include="Events\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToMods)'=='true'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)nml_mods" />
+    <Message Text="Copied $(TargetFileName) to $(NeosPath)nml_mods" Importance="high" />
+  </Target>
+</Project>
