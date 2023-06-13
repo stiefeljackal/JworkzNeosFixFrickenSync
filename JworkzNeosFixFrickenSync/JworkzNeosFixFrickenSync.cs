@@ -17,7 +17,7 @@ namespace JworkzNeosMod
 
         private static ModConfiguration Config;
 
-        private Harmony harmony;
+        private Harmony _harmony;
 
         public bool IsEnabled { get; private set; }
 
@@ -31,12 +31,12 @@ namespace JworkzNeosMod
 
         public override void OnEngineInit()
         {
-            harmony = new Harmony($"jworkz.sjackal.{Name}");
+            _harmony = new Harmony($"jworkz.sjackal.{Name}");
             Config = GetConfiguration();
             Config.OnThisConfigurationChanged += OnConfigurationChanged;
             Engine.Current.OnReady += OnCurrentNeosEngineReady;
 
-            harmony.PatchAll();
+            _harmony.PatchAll();
         }
 
         private void RefreshMod()
@@ -63,10 +63,12 @@ namespace JworkzNeosMod
 
         private void TurnOffMod()
         {
+            _harmony.PatchAll();
         }
 
         private void TurnOnMod()
         {
+            _harmony.UnpatchAll(_harmony.Id);
         }
 
         private void OnConfigurationChanged(ConfigurationChangedEvent @event) => RefreshMod();
