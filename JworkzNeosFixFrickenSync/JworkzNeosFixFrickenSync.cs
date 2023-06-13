@@ -6,11 +6,9 @@ namespace JworkzNeosMod
 {
     public class JworkzNeosFixFrickenSync : NeosMod
     {
-        public const int DEFAULT_APPLY_DELAY_UPDATES = 6;
-
         public override string Name => nameof(JworkzNeosFixFrickenSync);
         public override string Author => "Stiefel Jackal";
-        public override string Version => "1.0.0";
+        public override string Version => "0.1.0";
         public override string Link => "https://github.com/stiefeljackal/NeosFixFrickenSync";
 
         [AutoRegisterConfigKey]
