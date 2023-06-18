@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using System.Threading;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using CloudX.Shared;
 using MonoMod.Utils;
 using NeosModLoader;
@@ -15,6 +16,9 @@ namespace JworkzNeosMod.Patches
         private static readonly MethodInfo _runUploadInternalMethod = AccessTools.Method(typeof(RecordUploadTaskBase<FrooxEngine.Record>), "RunUploadInternal");
         private static readonly FieldInfo _completionSourceField = AccessTools.Field(typeof(RecordUploadTaskBase<FrooxEngine.Record>), "_completionSource");
         private static readonly MethodInfo _failMethod = AccessTools.Method(typeof(RecordUploadTaskBase<FrooxEngine.Record>), "Fail");
+
+        private static readonly Regex _clientErrorMatcher = new Regex(@"state: 4\d\d", RegexOptions.Compiled);
+        private static readonly Regex _terminalServerErrorMatcher = new Regex(@"state: (501|505|511)", RegexOptions.Compiled);
 
         internal static byte MaxUploadRetries { get; set; }
         internal static TimeSpan RetryDelay { get; set; }
@@ -48,6 +52,11 @@ namespace JworkzNeosMod.Patches
                         catch (Exception ex)
                         {
                             NeosMod.Error($"Exception during record upload task (attempt {retryCount + 1} out of {maxRetryCount}): {ex}");
+
+                            if (!__instance.ShouldRetry())
+                            {
+                                break;
+                            }
                         }
 
                         ++retryCount;
@@ -69,6 +78,23 @@ namespace JworkzNeosMod.Patches
             );
 
             return false;
+        }
+
+        private static bool ShouldRetry(this RecordUploadTaskBase<FrooxEngine.Record> uploadTask)
+        {
+            switch (uploadTask.FailReason.Trim().ToLowerInvariant())
+            {
+                case var r1 when r1.Contains("conflict"):
+                case var r2 when r2.Contains("preprocessing failed"):
+                    return false;
+                case var r3 when r3.Contains("state: 429"):
+                    return true; // catch this before the next line
+                case var r4 when _clientErrorMatcher.IsMatch(r4):
+                case var r5 when _terminalServerErrorMatcher.IsMatch(r5):
+                    return false;
+                default:
+                    return true;
+            }
         }
     }
 }
