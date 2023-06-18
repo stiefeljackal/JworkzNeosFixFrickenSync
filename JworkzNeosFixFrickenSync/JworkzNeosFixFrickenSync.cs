@@ -61,12 +61,12 @@ namespace JworkzNeosMod
             }
         }
 
-        private void TurnOffMod()
+        private void TurnOnMod()
         {
             _harmony.PatchAll();
         }
 
-        private void TurnOnMod()
+        private void TurnOffMod()
         {
             _harmony.UnpatchAll(_harmony.Id);
         }
