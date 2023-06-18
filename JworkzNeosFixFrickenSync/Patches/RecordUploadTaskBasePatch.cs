@@ -15,7 +15,7 @@ using NeosModLoader;
 namespace JworkzNeosMod.Patches
 {
     [HarmonyPatch(typeof(RecordUploadTaskBase<FrooxEngine.Record>))]
-    internal class RecordUploadTaskBasePatch
+    internal static class RecordUploadTaskBasePatch
     {
         private static MethodInfo _runUploadInternalMethod;
 
@@ -99,7 +99,7 @@ namespace JworkzNeosMod.Patches
                 }
                 catch (Exception ex)
                 {
-                    UniLog.Error("Exception during record upload task:\n" + ex?.ToString());
+                    NeosMod.Error($"Exception during record upload task:\n {ex?.ToString()}");
                     failMethod($"Exception during sync.");
                 }
             });
