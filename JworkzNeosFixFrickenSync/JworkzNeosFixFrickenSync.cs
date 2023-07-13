@@ -3,6 +3,7 @@ using NeosModLoader;
 using HarmonyLib;
 using FrooxEngine;
 using JworkzNeosMod.Patches;
+using JworkzNeosMod.Services;
 
 namespace JworkzNeosMod
 {
@@ -10,7 +11,7 @@ namespace JworkzNeosMod
     {
         public override string Name => nameof(JworkzNeosFixFrickenSync);
         public override string Author => "Stiefel Jackal";
-        public override string Version => "0.1.2";
+        public override string Version => "1.0.0";
         public override string Link => "https://github.com/stiefeljackal/NeosFixFrickenSync";
 
         [AutoRegisterConfigKey]
@@ -27,11 +28,23 @@ namespace JworkzNeosMod
 
         private static ModConfiguration Config;
 
+        public static ModConfiguration.ConfigurationChangedEventHandler OnBaseModConfigurationChanged;
+
         private Harmony _harmony;
 
-        public bool IsEnabled { get; private set; }
+        private bool _isPrevEnabled;
+
+        public static bool IsEnabled => Config?.GetValue(KEY_ENABLE) ?? false;
+
+        public static byte RetryCount => Config?.GetValue(KEY_RETRY_COUNT) ?? 0;
+
+        public static TimeSpan RetryDelay => Config?.GetValue(KEY_RETRY_DELAY) ?? TimeSpan.Zero;
 
 
+        /// <summary>
+        /// Defines the metadata for the mod and other mod configurations.
+        /// </summary>
+        /// <param name="builder">The mod configuration definition builder responsible for building and adding details about this mod.</param>
         public override void DefineConfiguration(ModConfigurationDefinitionBuilder builder)
         {
             builder
@@ -39,6 +52,9 @@ namespace JworkzNeosMod
                 .AutoSave(false);
         }
 
+        /// <summary>
+        /// Called when the engine initializes.
+        /// </summary>
         public override void OnEngineInit()
         {
             _harmony = new Harmony($"jworkz.sjackal.{Name}");
@@ -46,26 +62,28 @@ namespace JworkzNeosMod
             Config.OnThisConfigurationChanged += OnConfigurationChanged;
             Engine.Current.OnReady += OnCurrentNeosEngineReady;
 
-            RecordUploadTaskBasePatch.MaxUploadRetries = Config.GetValue(KEY_RETRY_COUNT);
-            RecordUploadTaskBasePatch.RetryDelay = Config.GetValue(KEY_RETRY_DELAY);
-
             _harmony.PatchAll();
         }
 
+        /// <summary>
+        /// Refreshes the current state of the mod.
+        /// </summary>
         private void RefreshMod()
         {
-            RecordUploadTaskBasePatch.MaxUploadRetries = Config.GetValue(KEY_RETRY_COUNT);
-            RecordUploadTaskBasePatch.RetryDelay = Config.GetValue(KEY_RETRY_DELAY);
-
             var isEnabled = Config.GetValue(KEY_ENABLE);
             ToggleHarmonyPatchState(isEnabled);
         }
 
+        /// <summary>
+        /// Toggls the Enabled and Disabled state of the mod depending on the passed state.
+        /// </summary>
+        /// <param name="isEnabled">true if the mod should be enabled; otherwise, false if the mod should be disabled.</param>
         private void ToggleHarmonyPatchState(bool isEnabled)
         {
-            if (isEnabled == IsEnabled) { return; }
+            if (isEnabled == _isPrevEnabled) { return; }
 
-            IsEnabled = isEnabled;
+            _isPrevEnabled = isEnabled;
+
 
             if (!IsEnabled)
             {
@@ -77,19 +95,37 @@ namespace JworkzNeosMod
             }
         }
 
+        /// <summary>
+        /// Enables the mod.
+        /// </summary>
         private void TurnOnMod()
         {
             _harmony.PatchAll();
+            RecordUploadTaskBasePatch.UploadTaskProgress += SyncLogger.LogUploadUpdate;
         }
 
+        /// <summary>
+        /// Disables the mod.
+        /// </summary>
         private void TurnOffMod()
         {
+            RecordUploadTaskBasePatch.UploadTaskProgress -= SyncLogger.LogUploadUpdate;
+
             _harmony.UnpatchAll(_harmony.Id);
         }
 
-        private void OnConfigurationChanged(ConfigurationChangedEvent @event) => RefreshMod();
+        /// <summary>
+        /// Called when the configuration is changed.
+        /// </summary>
+        /// <param name="event">The event information that details the configuration change.</param>
+        private void OnConfigurationChanged(ConfigurationChangedEvent @event) {
+            RefreshMod();
+            OnBaseModConfigurationChanged(@event);
+        }
 
-
+        /// <summary>
+        /// Called when the Neos Engine is ready.
+        /// </summary>
         private void OnCurrentNeosEngineReady() => RefreshMod();
     }
 }

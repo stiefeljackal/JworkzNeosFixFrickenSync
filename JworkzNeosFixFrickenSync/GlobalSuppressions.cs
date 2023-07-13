@@ -5,4 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:JworkzNeosMod.Patches.RecordUploadTaskBasePatch.RunUploadPrefix(CloudX.Shared.RecordUploadTaskBase{FrooxEngine.Record}@,System.Threading.Tasks.Task@,System.Threading.CancellationToken)~System.Boolean")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony Patch Method", Scope = "member", Target = "~M:JworkzNeosMod.Patches.RecordUploadTaskBasePatch.RunUploadPrefix(CloudX.Shared.RecordUploadTaskBase{FrooxEngine.Record},System.Threading.Tasks.Task@,System.Threading.CancellationToken)~System.Boolean")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony Patch Method", Scope = "member", Target = "~M:JworkzNeosMod.Patches.RecordUploadTaskBasePatch.StageDescriptionSetterPostFix(CloudX.Shared.RecordUploadTaskBase{FrooxEngine.Record},System.String)")]
