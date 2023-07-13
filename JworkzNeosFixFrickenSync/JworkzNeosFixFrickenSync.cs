@@ -16,7 +16,7 @@ namespace JworkzNeosMod
 
         [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<bool> KEY_ENABLE =
-            new ModConfigurationKey<bool>("enabled", $"Enables the {nameof(JworkzNeosFixFrickenSync)} mod", () => true);
+            new ModConfigurationKey<bool>("enabled", $"Enables the {nameof(JworkzNeosFixFrickenSync)} mod.", () => true);
 
         [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<byte> KEY_RETRY_COUNT =
