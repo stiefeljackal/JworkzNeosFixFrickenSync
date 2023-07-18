@@ -202,7 +202,8 @@ namespace JworkzNeosMod.Patches
                 case var r1 when r1.Contains("conflict"):
                 case var r2 when r2.Contains("preprocessing failed"):
                     return false;
-                case var r3 when r3.Contains("state: 429"):
+                case var r6 when r6.Contains("state: 429"):
+                case var r3 when r3.Contains("toomanyrequests"):
                     return true; // catch this before the next line
                 case var r4 when _clientErrorMatcher.IsMatch(r4):
                 case var r5 when _terminalServerErrorMatcher.IsMatch(r5):
