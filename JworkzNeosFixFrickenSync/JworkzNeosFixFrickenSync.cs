@@ -60,9 +60,8 @@ namespace JworkzNeosMod
             _harmony = new Harmony($"jworkz.sjackal.{Name}");
             Config = GetConfiguration();
             Config.OnThisConfigurationChanged += OnConfigurationChanged;
-            Engine.Current.OnReady += OnCurrentNeosEngineReady;
 
-            _harmony.PatchAll();
+            RefreshMod();
         }
 
         /// <summary>
@@ -124,10 +123,5 @@ namespace JworkzNeosMod
             RefreshMod();
             OnBaseModConfigurationChanged(@event);
         }
-
-        /// <summary>
-        /// Called when the Neos Engine is ready.
-        /// </summary>
-        private void OnCurrentNeosEngineReady() => RefreshMod();
     }
 }
