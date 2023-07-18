@@ -41,3 +41,4 @@ Syncing errors should occur normally, but they should not be halting other sync 
 * This mod is dedicated to the people of [Creator Jam (CJ)](https://discord.gg/WFmySeSGPh) 🍞. This mod was made out of the frustration and sadness experienced during CJ 211 (Traffic Jam) due to the "stuck sync" problem.
 * [Jax](https://github.com/Nihlus) for contributing  to the retry sync feature and providing additional code clean-up while I was away on vacation during that time.
 * Rucio for testing this mod out on the Creator Jam headless server.
+* Lux and friend for assisting me in debugging the error log entry not showing in the logs.
