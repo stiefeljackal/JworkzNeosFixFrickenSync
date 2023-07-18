@@ -72,7 +72,11 @@ namespace JworkzNeosMod.Patches
                             timer.Dispose();
                             OnUploadTaskSuccess(__instance);
 
-                            return;
+                            if (!__instance.Failed)
+                            {
+                                OnUploadTaskSuccess(__instance);
+                                return;
+                            };
                         }
                         catch (Exception ex)
                         {
