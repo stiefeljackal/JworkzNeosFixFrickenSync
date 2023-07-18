@@ -32,7 +32,6 @@ namespace JworkzNeosMod.Services
         /// <param name="event">The error information of the upload task.</param>
         public static void LogUploadFailure(object _, UploadTaskFailureEventArgs @event)
         {
-            NeosMod.Msg("AHHH");
             var record = @event.Record;
 
             NeosMod.Error($"Failed sync for {record.OwnerId}:{record.RecordId}. Local: {record.LocalVersion}, Global: {record.GlobalVersion}:\n" + @event.FailureReason);
