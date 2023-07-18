@@ -102,6 +102,7 @@ namespace JworkzNeosMod
         {
             _harmony.PatchAll();
             RecordUploadTaskBasePatch.UploadTaskProgress += SyncLogger.LogUploadUpdate;
+            RecordUploadTaskBasePatch.UploadTaskFailure += SyncLogger.LogUploadFailure;
         }
 
         /// <summary>
@@ -109,6 +110,7 @@ namespace JworkzNeosMod
         /// </summary>
         private void TurnOffMod()
         {
+            RecordUploadTaskBasePatch.UploadTaskFailure -= SyncLogger.LogUploadFailure;
             RecordUploadTaskBasePatch.UploadTaskProgress -= SyncLogger.LogUploadUpdate;
 
             _harmony.UnpatchAll(_harmony.Id);

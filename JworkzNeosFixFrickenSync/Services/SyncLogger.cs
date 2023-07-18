@@ -24,5 +24,18 @@ namespace JworkzNeosMod.Services
 
             NeosMod.Msg($"Record '{record.Name} ({record.RecordId})' | Progress: {progressState.Progress * 100}% | Stage: {progressState.Stage}");
         }
+
+        /// <summary>
+        /// Logs the failure of the upload task.
+        /// </summary>
+        /// <param name="_">The object that triggered the event.</param>
+        /// <param name="event">The error information of the upload task.</param>
+        public static void LogUploadFailure(object _, UploadTaskFailureEventArgs @event)
+        {
+            NeosMod.Msg("AHHH");
+            var record = @event.Record;
+
+            NeosMod.Error($"Failed sync for {record.OwnerId}:{record.RecordId}. Local: {record.LocalVersion}, Global: {record.GlobalVersion}:\n" + @event.FailureReason);
+        }
     }
 }

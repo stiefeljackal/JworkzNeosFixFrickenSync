@@ -70,7 +70,6 @@ namespace JworkzNeosMod.Patches
                             _ = completionSource.TrySetResult(__instance.IsFinished);
 
                             timer.Dispose();
-                            OnUploadTaskSuccess(__instance);
 
                             if (!__instance.Failed)
                             {
