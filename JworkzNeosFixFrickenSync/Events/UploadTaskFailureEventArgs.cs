@@ -1,4 +1,5 @@
 ﻿using FrooxEngine;
+using JworkzNeosMod.Models;
 
 namespace JworkzNeosMod.Events
 {
@@ -15,7 +16,7 @@ namespace JworkzNeosMod.Events
         /// </summary>
         /// <param name="record">The associated Neos Record that encountered a sync failure.</param>
         /// <param name="failureReason">The reason why the sync failed for this record.</param>
-        public UploadTaskFailureEventArgs(Record record, string failureReason) : base(record)
+        public UploadTaskFailureEventArgs(Record record, string failureReason) : base(record, new UploadProgressState($"Failure: {failureReason}", false))
         {
             FailureReason = failureReason;
         }

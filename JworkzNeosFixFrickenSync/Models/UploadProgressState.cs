@@ -8,9 +8,15 @@
         public string Stage { get; }
 
         /// <summary>
-        /// THe current progress of the upload as a percentage.
+        /// The current progress of the upload as a percentage.
         /// </summary>
         public float Progress { get; }
+
+        /// <summary>
+        /// An indicator to tell if the sync was successful, a failure, or still in progress. true for
+        /// successful, false for failure, and null for in progress.
+        /// </summary>
+        public bool? IsSuccessful { get; }
 
         /// <summary>
         /// Creates an instance of UploadProgressState that contains the current upload progres
@@ -18,10 +24,11 @@
         /// </summary>
         /// <param name="stage">The current stage of the upload.</param>
         /// <param name="progress">The current progress of the upload as a percentage; defaults to 0f if none is provided.</param>
-        public UploadProgressState(string stage, float progress = 0f)
+        public UploadProgressState(string stage, bool? isSuccessful = null, float progress = 0f)
         {
-            Progress = progress;
             Stage = stage;
+            IsSuccessful = isSuccessful;
+            Progress = isSuccessful.HasValue ? 1f : progress;
         }
 
         public override bool Equals(object obj)
@@ -30,8 +37,11 @@
 
             var rhs = (UploadProgressState)obj;
 
-            return this.Stage == rhs.Stage && (this.Progress * 1000) == (rhs.Progress * 1000);
+            return this.Stage == rhs.Stage && (this.Progress * 1000) == (rhs.Progress * 1000) && this.IsSuccessful == rhs.IsSuccessful;
         }
+
+        public override int GetHashCode() =>
+            Stage.GetHashCode() * 100000 + (int)(Progress * 1000) + (IsSuccessful.HasValue ? (IsSuccessful.Value ? 1 : 0) : 2) * 10000;
 
         public static bool operator ==(UploadProgressState lhs, UploadProgressState rhs)
             => lhs.Equals(rhs);

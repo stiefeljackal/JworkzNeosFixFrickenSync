@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -8,8 +9,10 @@ using CloudX.Shared;
 using HarmonyLib;
 using NeosModLoader;
 using JworkzNeosMod.Events;
-using FrooxEngineRecord = FrooxEngine.Record;
 using JworkzNeosMod.Models;
+using FrooxEngine;
+using JworkzNeosMod.Utilities;
+using FrooxEngineRecord = FrooxEngine.Record;
 
 namespace JworkzNeosMod.Patches
 {
@@ -142,7 +145,7 @@ namespace JworkzNeosMod.Patches
         [HarmonyPatch(nameof(RecordUploadTaskBase<FrooxEngineRecord>.StageDescription), MethodType.Setter)]
         private static void StageDescriptionSetterPostFix(RecordUploadTaskBase<FrooxEngineRecord> __instance, string value)
         {
-            var currentState = new UploadProgressState(value, __instance.Progress);
+            var currentState = new UploadProgressState(value, null, __instance.Progress);
             if (!CanTriggerProgressEvent(__instance, currentState)) { return; }
             OnUploadTaskProgress(__instance, currentState);
         }
@@ -181,7 +184,7 @@ namespace JworkzNeosMod.Patches
         /// <returns>The Timer instance that will run at a certain rate.</returns>
         private static Timer CreateProgressTimer(RecordUploadTaskBase<FrooxEngineRecord> task) => new Timer((object _) =>
         {
-            var currentState = new UploadProgressState(task.StageDescription, task.Progress);
+            var currentState = new UploadProgressState(task.StageDescription, null, task.Progress);
             if (!CanTriggerProgressEvent(task, currentState)) { return; }
             OnUploadTaskProgress(task, currentState);
         }, null, PROGRESS_TIMER_INTERVAL_BY_MILLI, PROGRESS_TIMER_INTERVAL_BY_MILLI);
