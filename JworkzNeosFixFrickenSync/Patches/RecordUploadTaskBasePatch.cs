@@ -35,6 +35,7 @@ namespace JworkzNeosMod.Patches
             new ConcurrentDictionary<RecordUploadTaskBase<FrooxEngineRecord>, UploadProgressState>();
 
 
+        public static event EventHandler<UploadTaskStartEventArgs> UploadTaskStart;
         public static event EventHandler<UploadTaskProgressEventArgs> UploadTaskProgress;
         public static event EventHandler<UploadTaskSuccessEventArgs> UploadTaskSuccess;
         public static event EventHandler<UploadTaskFailureEventArgs> UploadTaskFailure;
@@ -257,6 +258,39 @@ namespace JworkzNeosMod.Patches
             if (record == null || (string.IsNullOrEmpty(stage) && progress < 0.01f)) { return; }
 
             UploadTaskProgress?.Invoke(uploadTask, new UploadTaskProgressEventArgs(record, currentState));
+        }
+
+        /// <summary>
+        /// Triggers an UploadTaskStart event for all listeners to indicate that an upload task is currently queued for syncing.
+        /// </summary>
+        /// <param name="uploadTask">The upload task that is queued for syncing.</param>
+        private static void OnUploadTaskStart(RecordUploadTaskBase<FrooxEngineRecord> uploadTask)
+        {
+            var record = uploadTask.Record;
+
+            if (record == null) { return; }
+
+            UploadTaskStart?.Invoke(uploadTask, new UploadTaskStartEventArgs(record));
+        }
+
+
+
+        [HarmonyPatch(typeof(RecordManager), "LoadUnsyncedRecords")]
+        [HarmonyPatch("FrooxEngine.RecordManager+<SaveRecord>d__54", "MoveNext")]
+        public class RecordManagerPatch
+        {
+            /// <summary>
+            /// Bulk triger multiple UploadTaskStart events for upload tasks that are queued up for syncing.
+            /// </summary>
+            [HarmonyPostfix]
+            private static void LoadUnsyncedRecordsPostfix()
+            {
+                var uploadTasks = Engine.Current.RecordManager.GetRecordsToSync().ToArray();
+                foreach (var uploadTask in uploadTasks)
+                {
+                    OnUploadTaskStart(uploadTask);
+                }
+            }
         }
     }
 }
