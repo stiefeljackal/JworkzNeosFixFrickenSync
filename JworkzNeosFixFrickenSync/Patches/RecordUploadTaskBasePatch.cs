@@ -95,7 +95,7 @@ namespace JworkzNeosMod.Patches
 
                     }
 
-                    // We may not have signalled completion at this point, so if we haven't, notify the system of failure
+                    // We may not have signaled completion at this point, so if we haven't, notify the system of failure
                     if (!completionSource.Task.IsCompleted)
                     {
                         FailPrefix(__instance,
@@ -140,13 +140,13 @@ namespace JworkzNeosMod.Patches
         /// Patches the setter for StageDescription by adding a postfix that will fire an event if the stage
         /// description should update to a newer value.
         /// </summary>
-        /// <param name="__instance">The reocrd upload task instance.</param>
-        /// <param name="value">The new vlue for StageDescription.</param>
+        /// <param name="__instance">The record upload task instance.</param>
+        /// <param name="value">The new value for StageDescription.</param>
         [HarmonyPostfix]
         [HarmonyPatch(nameof(RecordUploadTaskBase<FrooxEngineRecord>.StageDescription), MethodType.Setter)]
         private static void StageDescriptionSetterPostFix(RecordUploadTaskBase<FrooxEngineRecord> __instance, string value)
         {
-            var currentState = new UploadProgressState(value, null, __instance.Progress);
+            var currentState = new UploadProgressState(value, UploadProgressIndicator.InProgress, __instance.Progress);
             if (!CanTriggerProgressEvent(__instance, currentState)) { return; }
             OnUploadTaskProgress(__instance, currentState);
         }
@@ -185,7 +185,7 @@ namespace JworkzNeosMod.Patches
         /// <returns>The Timer instance that will run at a certain rate.</returns>
         private static Timer CreateProgressTimer(RecordUploadTaskBase<FrooxEngineRecord> task) => new Timer((object _) =>
         {
-            var currentState = new UploadProgressState(task.StageDescription, null, task.Progress);
+            var currentState = new UploadProgressState(task.StageDescription, UploadProgressIndicator.InProgress, task.Progress);
             if (!CanTriggerProgressEvent(task, currentState)) { return; }
             OnUploadTaskProgress(task, currentState);
         }, null, PROGRESS_TIMER_INTERVAL_BY_MILLI, PROGRESS_TIMER_INTERVAL_BY_MILLI);

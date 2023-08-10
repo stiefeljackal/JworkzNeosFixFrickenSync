@@ -1,4 +1,5 @@
 ﻿using FrooxEngine;
+using JworkzNeosMod.Models;
 
 namespace JworkzNeosMod.Events
 {
@@ -9,6 +10,6 @@ namespace JworkzNeosMod.Events
         /// this record was successful.
         /// </summary>
         /// <param name="record">The associated Neos Record that was synced successfully.</param>
-        public UploadTaskSuccessEventArgs(Record record) : base(record, new Models.UploadProgressState("Synced", true)) { }
+        public UploadTaskSuccessEventArgs(Record record) : base(record, new Models.UploadProgressState("Synced", UploadProgressIndicator.Success)) { }
     }
 }
