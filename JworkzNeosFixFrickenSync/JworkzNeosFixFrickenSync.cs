@@ -12,7 +12,7 @@ namespace JworkzNeosMod
         public override string Name => nameof(JworkzNeosFixFrickenSync);
         public override string Author => "Stiefel Jackal";
         public override string Version => "1.1.0";
-        public override string Link => "https://github.com/stiefeljackal/NeosFixFrickenSync";
+        public override string Link => "https://github.com/stiefeljackal/JworkzNeosFixFrickenSync";
 
         [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<bool> KEY_ENABLE =
@@ -28,7 +28,7 @@ namespace JworkzNeosMod
 
         [AutoRegisterConfigKey]
         private static readonly ModConfigurationKey<bool> ENABLE_INPROGRESS_LOGGING =
-            new ModConfigurationKey<bool>("enableInProgressLogging", "Whether or not the sync task in progress should log its progress.", () => false);
+            new ModConfigurationKey<bool>("enableInProgressLogging", "Allow the sync task to periodically log its progress. Stage updates are unaffected.", () => false);
 
         private static ModConfiguration Config;
 
