@@ -7,7 +7,7 @@ A [NeosModLoader](https://github.com/neos-modding-group/NeosModLoader) mod for [
 
 ## Installation
 1. Install [NeosModLoader](https://github.com/zkxs/NeosModLoader).
-2. Place [JworkzNeosFixFrickenSync.dll](https://github.com/zkxs/JworkzNeosFixFrickenSync/releases/latest/download/JworkzNeosFixFrickenSync.dll) into your `nml_mods` folder. This folder should be located in the same folder as Neos. For a default installation, the typical location is `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods`. You can create it if it's missing, or if you launch the game once with NeosModLoader installed it will create the folder for you.
+2. Place [JworkzNeosFixFrickenSync.dll](https://github.com/stiefeljackal/JworkzNeosFixFrickenSync/releases/latest/download/JworkzNeosFixFrickenSync.dll) into your `nml_mods` folder. This folder should be located in the same folder as Neos. For a default installation, the typical location is `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods`. You can create it if it's missing, or if you launch the game once with NeosModLoader installed it will create the folder for you.
 3. Start the game. If you want to verify that the mod is working, you can check your Neos logs.
 
 ## Config Options
