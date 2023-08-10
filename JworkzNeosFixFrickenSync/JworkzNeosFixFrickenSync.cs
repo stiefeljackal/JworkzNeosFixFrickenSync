@@ -26,6 +26,10 @@ namespace JworkzNeosMod
         private static readonly ModConfigurationKey<TimeSpan> KEY_RETRY_DELAY =
             new ModConfigurationKey<TimeSpan>("retryDelay", "The delay between attempts to retry failed sync actions.", () => TimeSpan.Zero);
 
+        [AutoRegisterConfigKey]
+        private static readonly ModConfigurationKey<bool> ENABLE_INPROGRESS_LOGGING =
+            new ModConfigurationKey<bool>("enableInProgressLogging", "Whether or not the sync task in progress should log its progress.", () => false);
+
         private static ModConfiguration Config;
 
         public static ModConfiguration.ConfigurationChangedEventHandler OnBaseModConfigurationChanged;
@@ -40,6 +44,7 @@ namespace JworkzNeosMod
 
         public static TimeSpan RetryDelay => Config?.GetValue(KEY_RETRY_DELAY) ?? TimeSpan.Zero;
 
+        public static bool IsInProgressLoggingEnabled => Config?.GetValue(ENABLE_INPROGRESS_LOGGING) ?? false;
 
         /// <summary>
         /// Defines the metadata for the mod and other mod configurations.

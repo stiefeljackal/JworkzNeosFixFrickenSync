@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -8,8 +9,10 @@ using CloudX.Shared;
 using HarmonyLib;
 using NeosModLoader;
 using JworkzNeosMod.Events;
-using FrooxEngineRecord = FrooxEngine.Record;
 using JworkzNeosMod.Models;
+using FrooxEngine;
+using JworkzNeosMod.Utilities;
+using FrooxEngineRecord = FrooxEngine.Record;
 
 namespace JworkzNeosMod.Patches
 {
@@ -32,6 +35,7 @@ namespace JworkzNeosMod.Patches
             new ConcurrentDictionary<RecordUploadTaskBase<FrooxEngineRecord>, UploadProgressState>();
 
 
+        public static event EventHandler<UploadTaskStartEventArgs> UploadTaskStart;
         public static event EventHandler<UploadTaskProgressEventArgs> UploadTaskProgress;
         public static event EventHandler<UploadTaskSuccessEventArgs> UploadTaskSuccess;
         public static event EventHandler<UploadTaskFailureEventArgs> UploadTaskFailure;
@@ -60,7 +64,9 @@ namespace JworkzNeosMod.Patches
                     var delay = JworkzNeosFixFrickenSync.RetryDelay;
                     var shouldRetry = true;
                     var record = __instance.Record;
-                    var timer = CreateProgressTimer(__instance);
+
+                    var timer = JworkzNeosFixFrickenSync.IsInProgressLoggingEnabled ? CreateProgressTimer(__instance) : null;
+                    
 
                     for (var retryCount = 0;  retryCount < maxRetryCount && !cancellationToken.IsCancellationRequested; retryCount++)
                     {
@@ -69,7 +75,7 @@ namespace JworkzNeosMod.Patches
                             await uploadTask.ConfigureAwait(false);
                             _ = completionSource.TrySetResult(__instance.IsFinished);
 
-                            timer.Dispose();
+                            timer?.Dispose();
 
                             if (!__instance.Failed)
                             {
@@ -91,7 +97,7 @@ namespace JworkzNeosMod.Patches
 
                     }
 
-                    // We may not have signalled completion at this point, so if we haven't, notify the system of failure
+                    // We may not have signaled completion at this point, so if we haven't, notify the system of failure
                     if (!completionSource.Task.IsCompleted)
                     {
                         FailPrefix(__instance,
@@ -102,7 +108,7 @@ namespace JworkzNeosMod.Patches
                         ));
                     }
 
-                    timer.Dispose();
+                    timer?.Dispose();
                     OnUploadTaskFailure(__instance, __instance.FailReason);
 
                 },
@@ -136,13 +142,13 @@ namespace JworkzNeosMod.Patches
         /// Patches the setter for StageDescription by adding a postfix that will fire an event if the stage
         /// description should update to a newer value.
         /// </summary>
-        /// <param name="__instance">The reocrd upload task instance.</param>
-        /// <param name="value">The new vlue for StageDescription.</param>
+        /// <param name="__instance">The record upload task instance.</param>
+        /// <param name="value">The new value for StageDescription.</param>
         [HarmonyPostfix]
         [HarmonyPatch(nameof(RecordUploadTaskBase<FrooxEngineRecord>.StageDescription), MethodType.Setter)]
         private static void StageDescriptionSetterPostFix(RecordUploadTaskBase<FrooxEngineRecord> __instance, string value)
         {
-            var currentState = new UploadProgressState(value, __instance.Progress);
+            var currentState = new UploadProgressState(value, UploadProgressIndicator.InProgress, __instance.Progress);
             if (!CanTriggerProgressEvent(__instance, currentState)) { return; }
             OnUploadTaskProgress(__instance, currentState);
         }
@@ -181,7 +187,7 @@ namespace JworkzNeosMod.Patches
         /// <returns>The Timer instance that will run at a certain rate.</returns>
         private static Timer CreateProgressTimer(RecordUploadTaskBase<FrooxEngineRecord> task) => new Timer((object _) =>
         {
-            var currentState = new UploadProgressState(task.StageDescription, task.Progress);
+            var currentState = new UploadProgressState(task.StageDescription, UploadProgressIndicator.InProgress, task.Progress);
             if (!CanTriggerProgressEvent(task, currentState)) { return; }
             OnUploadTaskProgress(task, currentState);
         }, null, PROGRESS_TIMER_INTERVAL_BY_MILLI, PROGRESS_TIMER_INTERVAL_BY_MILLI);
@@ -254,6 +260,39 @@ namespace JworkzNeosMod.Patches
             if (record == null || (string.IsNullOrEmpty(stage) && progress < 0.01f)) { return; }
 
             UploadTaskProgress?.Invoke(uploadTask, new UploadTaskProgressEventArgs(record, currentState));
+        }
+
+        /// <summary>
+        /// Triggers an UploadTaskStart event for all listeners to indicate that an upload task is currently queued for syncing.
+        /// </summary>
+        /// <param name="uploadTask">The upload task that is queued for syncing.</param>
+        private static void OnUploadTaskStart(RecordUploadTaskBase<FrooxEngineRecord> uploadTask)
+        {
+            var record = uploadTask.Record;
+
+            if (record == null) { return; }
+
+            UploadTaskStart?.Invoke(uploadTask, new UploadTaskStartEventArgs(record));
+        }
+
+
+
+        [HarmonyPatch(typeof(RecordManager), "LoadUnsyncedRecords")]
+        [HarmonyPatch("FrooxEngine.RecordManager+<SaveRecord>d__54", "MoveNext")]
+        public class RecordManagerPatch
+        {
+            /// <summary>
+            /// Bulk triger multiple UploadTaskStart events for upload tasks that are queued up for syncing.
+            /// </summary>
+            [HarmonyPostfix]
+            private static void LoadUnsyncedRecordsPostfix()
+            {
+                var uploadTasks = Engine.Current.RecordManager.GetRecordsToSync().ToArray();
+                foreach (var uploadTask in uploadTasks)
+                {
+                    OnUploadTaskStart(uploadTask);
+                }
+            }
         }
     }
 }
