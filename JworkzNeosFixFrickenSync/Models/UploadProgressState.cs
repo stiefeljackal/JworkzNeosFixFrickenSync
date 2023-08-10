@@ -33,6 +33,7 @@
             {
                 case UploadProgressIndicator.Success:
                 case UploadProgressIndicator.Canceled:
+                case UploadProgressIndicator.Failure:
                     Progress = 1f;
                     break;
                 default:
