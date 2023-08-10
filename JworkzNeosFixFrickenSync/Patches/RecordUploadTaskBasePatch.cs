@@ -64,7 +64,9 @@ namespace JworkzNeosMod.Patches
                     var delay = JworkzNeosFixFrickenSync.RetryDelay;
                     var shouldRetry = true;
                     var record = __instance.Record;
-                    var timer = CreateProgressTimer(__instance);
+
+                    var timer = JworkzNeosFixFrickenSync.IsInProgressLoggingEnabled ? CreateProgressTimer(__instance) : null;
+                    
 
                     for (var retryCount = 0;  retryCount < maxRetryCount && !cancellationToken.IsCancellationRequested; retryCount++)
                     {
@@ -73,7 +75,7 @@ namespace JworkzNeosMod.Patches
                             await uploadTask.ConfigureAwait(false);
                             _ = completionSource.TrySetResult(__instance.IsFinished);
 
-                            timer.Dispose();
+                            timer?.Dispose();
 
                             if (!__instance.Failed)
                             {
@@ -106,7 +108,7 @@ namespace JworkzNeosMod.Patches
                         ));
                     }
 
-                    timer.Dispose();
+                    timer?.Dispose();
                     OnUploadTaskFailure(__instance, __instance.FailReason);
 
                 },
