@@ -11,7 +11,7 @@ namespace JworkzNeosMod
     {
         public override string Name => nameof(JworkzNeosFixFrickenSync);
         public override string Author => "Stiefel Jackal";
-        public override string Version => "1.1.0";
+        public override string Version => "2.0.0";
         public override string Link => "https://github.com/stiefeljackal/JworkzNeosFixFrickenSync";
 
         [AutoRegisterConfigKey]

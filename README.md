@@ -1,4 +1,4 @@
-# JworkzNeosFixFrickenSync
+# Neos Fix Fricken Sync (JworkzNeosFixFrickenSync)
 
 [![A image of the video demonstrating a fixed sync loop](https://img.youtube.com/vi/sKnmyzFoUWY/0.jpg)
 ](https://youtube.com/watch?v=sKnmyzFoUWY)
@@ -12,11 +12,25 @@ A [NeosModLoader](https://github.com/neos-modding-group/NeosModLoader) mod for [
 
 ## Config Options
 
-|Config Option|Default        |Description|
-|-------------|---------------|-----------|
-|`enabled`    |`true`         |Enables the mod.|
-|`retryCount` |`3`            |The number of times to retry failed sync actions.|
-|`retryDelay` |`TimeSpan.Zero`|The delay between attempts to retry failed sync actions.|
+|Config Option            |Default        |Description                                                                        |
+|-------------------------|---------------|-----------------------------------------------------------------------------------|
+|`enabled`                |`true`         |Enables the mod.                                                                   |
+|`retryCount`             |`3`            |The number of times to retry failed sync actions.                                  |
+|`retryDelay`             |`TimeSpan.Zero`|The delay between attempts to retry failed sync actions.                           |
+|`enableInProgressLogging`|`false`        |Allow the sync task to periodically log its progress. Stage updates are unaffected.|
+
+## Allowing Your Mods to Subscribe to Sync Task Events
+
+If you are a Mod developer and would like for your mod to to listen to sync task events, then your mod can subscribe to the following events:
+
+|Event Name          |Description                                          |
+|--------------------|-----------------------------------------------------|
+|`UploadTaskStart`   |When the sync queue receives a new sync task to sync.|
+|`UploadTaskProgress`|When a sync task makes progress.                     |
+|`UploadTaskSuccess` |When a sync task is successful.                      |
+|`UploadTaskFailure` |when a sync task failed.                             |
+
+All event handlers are located in the `RecordUploadTaskBasePatch` class as static event handlers.
 
 # The True Explanation of Stuck Sync
 
